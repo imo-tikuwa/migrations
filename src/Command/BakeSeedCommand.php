@@ -20,6 +20,8 @@ use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
 use Cake\Core\Configure;
+use Cake\Database\Type\StringType;
+use Cake\Database\TypeFactory;
 use Cake\Datasource\ConnectionManager;
 use Cake\Utility\Inflector;
 
@@ -132,9 +134,21 @@ class BakeSeedCommand extends SimpleBakeCommand
                 $query->select($fields);
             }
 
+            $types = TypeFactory::getMap();
+            TypeFactory::setMap(array_merge($types, [
+                'time' => StringType::class,
+                'date' => StringType::class,
+                'datetime' => StringType::class,
+                'timestamp' => StringType::class,
+                'datetimefractional' => StringType::class,
+                'timestampfractional' => StringType::class,
+            ]));
+
             /** @var array $records */
             $records = $query->toArray();
             $records = $this->prettifyArray($records);
+
+            TypeFactory::setMap($types);
         }
 
         return [
